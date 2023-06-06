@@ -1,0 +1,73 @@
+<!--
+\\Author: Prenom NOM
+\\Login : etuXXX
+\\Groupe: ISEN X GROUPE Y
+\\Annee:
+-->
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <!-- Meta tags -->
+
+    <!-- CSS Style -->
+
+    <!-- Font -->
+
+    <!-- Title -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
+    <script src="js/ajax.js" defer></script>
+    <script src="js/utils.js" defer></script>
+    <script src="js/filtrer.js" defer></script>
+
+  </head>
+  <body>
+    <!-- Header -->
+
+    <!-- Home -->
+    <div class="filtre">
+      <form id="filtreForm" method="post" action="php/request.php/filtre">
+        <label for="mois">Mois :</label>
+        <select id="mois" name="mois">
+          <option value="">Tous</option>
+          <option value="1">Janvier</option>
+          <option value="2">Février</option>
+          <option value ="3">Mars</option>
+          <option value ="4">Avril</option>
+          <option value ="5">Mai</option>
+          <option value ="6">Juin</option>
+          <option value ="7">Juillet</option>
+          <option value ="8">Août</option>
+          <option value ="9">Septembre</option>
+          <option value ="10">Octobre</option>
+          <option value ="11">Novembre</option>
+          <option value ="12">Décembre</option>
+
+        </select>
+    
+        <label for="descr_grav">Gravité :</label>
+        <select id="descr_grav" name="descr_grav">
+          <option value="">Tous</option>
+          <option value="Pas grave">Pas grave</option>
+          <option value="Grave">Grave</option>
+        </select>
+    
+        <label for="age">Âge :</label>
+        <select id="age" name="age">
+          <option value="">Tous</option>
+          <option value="0-20">0-20</option>
+          <option value="20-40">20-40</option>
+          <option value="40-60">40-60</option>
+          <option value="60-80">60-80</option>
+          <option value="80-90">80-90</option>
+        </select>
+    
+        <button type="submit">Filtrer</button>
+      </form>
+    </div>
+    
+    <div id="affiche">
+    </div> 
+    <!-- Footer -->
+  </body>
+</html>
