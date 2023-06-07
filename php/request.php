@@ -17,7 +17,7 @@ $requestRessource = array_shift($request);
 
 if ($requestMethod == 'GET' && $requestRessource == 'liste') {
   
-  $request = "SELECT * FROM grande_table_accidents $whereClause LIMIT 10";
+  $request = "SELECT * FROM accidents $whereClause LIMIT 20";
   $statement = $db->prepare($request);
   $statement->execute();
   $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -30,7 +30,7 @@ if ($requestMethod == 'POST' && $requestRessource == 'filtre') {
   $age = $_POST['age'];
 
   // Effectuer la requête en fonction des critères de filtrage
-  $request = 'SELECT * FROM grande_table_accidents WHERE 1=1';
+  $request = 'SELECT * FROM accidents WHERE 1=1';
 
   if (!empty($mois)) {
     $request .= " AND MONTH(`date`) = '$mois'";
@@ -54,7 +54,7 @@ if ($requestMethod == 'POST' && $requestRessource == 'filtre') {
     }
   }
 
-  $request .= " LIMIT 1000";
+  $request .= " LIMIT 20";
   $statement = $db->prepare($request);
   $statement->execute();
   $result = $statement->fetchAll(PDO::FETCH_ASSOC);

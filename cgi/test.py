@@ -1,44 +1,68 @@
 #!/usr/bin/python3.9
 
-# exemple d'appel du script en ligne de commande ou exec php : python /var/www/etu000/cgi/test.py request=bonjour
-# exemple d'appel du script depuis le navigateur http://etu000.projets.isen-ouest.fr/cgi/test.py?request=bonjour
-
-# ecrit le header requis pour un affichage dans le navigateur (ne pas oublier le retour à la ligne obligatoire en fin de print) 
-print ("Content-type: application/json \r\n")
-
-# https://docs.python.org/3.9/library/cgi.html
 import cgi
 import cgitb
-
-# https://www.w3schools.com/python/python_json.asp
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import SVC
 import json
+import pickle
+import os
 
-# activation debeug CGI
+print("Content-type: application/json\r\n")
+
 cgitb.enable()
 
-# recurperation des parametres de l'url envoyés par le formulaire dans la variable form
 form = cgi.FieldStorage()
 
-# verification de présence d'une clé dans le tableau form
-if 'request' not in form:
-    print('request attribute required !')
+if 'descr_cat_veh' not in form or 'descr_agglo' not in form or 'descr_lum' not in form or 'descr_athmo' not in form or 'descr_etat_surf' not in form or 'descr_type_col' not in form or 'latitude' not in form or 'longitude' not in form or 'descr_dispo_secu' not in form:
+    response = {'error': 'Missing parameter(s)'}
+    print(json.dumps(response))
     exit()
-    request = 'ERREUR'
-else:
-    # lecture de la valeur de l'attribut dans une variable
-    request = form['request'].value
 
-# la variable request doit normalement contenir la valeur fournie en argument lors de l'appel du script
-# on l'utilise ensuite pour realiser un affichage de démo:
+# Récupération des paramètres depuis le formulaire
+accident_info = {
+    'descr_cat_veh': int(form['descr_cat_veh'].value),
+    'descr_agglo': int(form['descr_agglo'].value),
+    'descr_lum': int(form['descr_lum'].value),
+    'descr_athmo': int(form['descr_athmo'].value),
+    'descr_etat_surf': int(form['descr_etat_surf'].value),
+    'descr_type_col': int(form['descr_type_col'].value),
+    'latitude': float(form['latitude'].value),
+    'longitude': float(form['longitude'].value),
+    'descr_dispo_secu': int(form['descr_dispo_secu'].value)
+}
 
-# variables de démo pour la transformation d'un dictionnaire et d'un tableau python en JSON
-tab = ['v1','v2','v3']
-dic = {'request': request, 'tab': tab}
+method = form['method'].value if 'method' in form else 'MLP'
 
-# transformation de la variable dic en chaine de caractères JSON
-dic_json = json.dumps(dic)
 
-# affichage d'exemple d'une chaine json
-# print ('{"request": "'+request+'", "tab": ["v1","v2","v3"]}')
-print(dic_json)
+svm = pickle.load(open('/var/www/etu121/cgi/svm.sav', 'rb'))
+#rf = pickle.load(open('/var/www/etu121/cgi/rf.sav', 'rb'))
+mlp = pickle.load(open('/var/www/etu121/cgi/mlp.sav', 'rb'))
+
+def haut_niveau_predict_accident(accident_info, method):
+    feature_names = ['descr_cat_veh', 'descr_agglo', 'descr_lum', 'descr_athmo', 'descr_etat_surf', 'descr_type_col', 'latitude', 'longitude', 'descr_dispo_secu']
+    accident_info_reordered = [accident_info[feature] for feature in feature_names]
+
+    if method == 'SVM':
+        predicted_class = svm.predict([accident_info_reordered])
+    #elif method == 'Random Forest':
+        #predicted_class = rf.predict([accident_info_reordered])[0]
+    elif method == 'MLP':
+        predicted_class = mlp.predict([accident_info_reordered])
+
+    predicted_class_string = "grave" if predicted_class == 0 else "pas grave"
+
+    result = {'descr_grav': predicted_class_string}
+
+    return result
+
+try:
+    predicted_class = haut_niveau_predict_accident(accident_info, method)
+    print(json.dumps(predicted_class))
+except Exception as e:
+    response = {'error': str(e)}
+    print(json.dumps(response))
 
