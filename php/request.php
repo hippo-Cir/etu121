@@ -60,6 +60,24 @@ if ($requestMethod == 'POST' && $requestRessource == 'filtre') {
   $result = $statement->fetchAll(PDO::FETCH_ASSOC);
   $data = $result;
 }
+if ($requestMethod == 'GET' && $requestRessource == 'prediction') {
+  
+  $request = "SELECT *, c.ia_cat,  c.ia_cat,  agg.ia_agglo,  l.ia_lum,  m.ia_athmo,  r.ia_route,  col.ia_col, secu.ia_secu,ville.longitude as longitude,ville.latitude as latitude
+  FROM accidents a
+  LEFT JOIN cat_vehicule c ON a.descr_cat_veh = c.descr_cat_veh
+  LEFT JOIN agglomeration agg ON a.descr_agglo = agg.descr_agglo
+  LEFT JOIN luminosite l ON a.descr_lum = l.descr_lum
+  LEFT JOIN meteo m ON a.descr_athmo = m.descr_athmo
+  LEFT JOIN etat_route r ON a.descr_etat_surf = r.descr_etat_surf
+  LEFT JOIN type_collision col ON a.descr_type_col = col.descr_type_col
+  LEFT JOIN ceinture secu ON a.descr_dispo_secu = secu.descr_dispo_secu
+  LEFT JOIN ville ON a.id_code_insee = ville.id_code_insee";
+  $statement = $db->prepare($request);  $statement = $db->prepare($request);
+$statement->execute();
+$result = $statement->fetchAll(PDO::FETCH_ASSOC);
+$data = $result;
+}
+
 // Send data to the client.
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-control: no-store, no-cache, must-revalidate');
